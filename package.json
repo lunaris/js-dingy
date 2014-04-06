@@ -1,6 +1,6 @@
 {
   "name": "dingy",
-  "description": "A simple JavaScript dependency injection library",
+  "description": "A simple dependency injection library for JavaScript",
   "version": "0.0.1",
   "dependencies": {
     "traceur": "*"
