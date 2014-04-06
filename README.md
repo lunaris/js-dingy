@@ -24,14 +24,17 @@ function GreeterUser(Greeter) {
 
 We can use Dingy to wire these two pieces of code in several ways.
 
-## Singleton instances
+## Externally-managed singleton instances
 
 ```javascript
-var dingy = new Dingy();
 var greeter = { sayHello: function() { console.log('Hello!'); } };
 
-dingy.registerInstance('Greeter', greeter);
-dingy.registerClass('GreeterUser', GreeterUser);
+var builder = new Dingy.Builder();
+
+builder.registerInstance('Greeter', greeter);
+builder.registerClass('GreeterUser', GreeterUser);
+
+var dingy = builder.inflate();
 
 var greeterUser = dingy.resolve('GreeterUser');
 greeterUser.useGreeter();
@@ -40,15 +43,18 @@ greeterUser.useGreeter();
 ## Function-based factories
 
 ```javascript
-var dingy = new Dingy();
 var greeterFactory = function() {
   return {
     sayHello: function() { console.log('Hello!'); }
   };
 };
 
-dingy.registerFunction('Greeter', greeterFactory);
-dingy.registerClass('GreeterUser', GreeterUser);
+var builder = new Dingy.Builder();
+
+builder.registerFunction('Greeter', greeterFactory);
+builder.registerClass('GreeterUser', GreeterUser);
+
+var dingy = builder.inflate();
 
 var greeterUser = dingy.resolve('GreeterUser');
 greeterUser.useGreeter();
@@ -57,14 +63,37 @@ greeterUser.useGreeter();
 ## Class-based factories
 
 ```javascript
-var dingy = new Dingy();
 var GreeterImpl = function() {
   this.sayHello = function() { console.log('Hello!'); };
 };
 
-dingy.registerClass('Greeter', GreeterImpl);
-dingy.registerClass('GreeterUser', GreeterUser);
+var builder = new Dingy.Builder();
+
+builder.registerClass('Greeter', GreeterImpl);
+builder.registerClass('GreeterUser', GreeterUser);
+
+var dingy = builder.inflate();
 
 var greeterUser = dingy.resolve('GreeterUser');
 greeterUser.useGreeter();
+```
+
+## Container-managed singleton instances
+
+```javascript
+var GreeterImpl = function() {
+  this.sayHello = function() { console.log('Hello!'); };
+};
+
+var builder = new Dingy.Builder();
+
+builder.registerClass('Greeter', GreeterImpl);
+builder.registerClass('GreeterUser', GreeterUser).asSingleton();
+
+var dingy = builder.inflate();
+
+var firstGreeterUser = dingy.resolve('GreeterUser');
+var secondGreeterUser = dingy.resolve('GreeterUser);
+
+expect(firstGreeterUser).toBe(secondGreeterUser);
 ```
